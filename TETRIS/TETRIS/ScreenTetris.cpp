@@ -8,13 +8,12 @@ void ScreenTetris::MenuScreen(RenderWindow & window)
 	int Number = 0;
 
 	Texture t_start_btn, t_exit_btn, t_about_btn;
-
-	t_start_btn.loadFromFile("IMAGE/start.png");
-	t_exit_btn.loadFromFile("IMAGE/exit.png");
-	t_about_btn.loadFromFile("IMAGE/about.png");
+	t_start_btn.loadFromFile(startButtonAddress);
+	t_exit_btn.loadFromFile(exitButtonAddress);
+	t_about_btn.loadFromFile(aboutButtonAddress);
 
 	Texture backgroundTexture;
-	backgroundTexture.loadFromFile("IMAGE/background8.png");
+	backgroundTexture.loadFromFile(menuBackgroundAddress);
 
 	Sprite start_btn(t_start_btn);
 	Sprite exit_btn(t_exit_btn);
@@ -27,7 +26,7 @@ void ScreenTetris::MenuScreen(RenderWindow & window)
 	background.setPosition(0, 0);
 
 	Font font;
-	font.loadFromFile("IMAGE/04B_03__.ttf");
+	font.loadFromFile(fontAddress);
 
 	Text text_name("", font, 160);
 	text_name.setStyle(sf::Text::Bold);
@@ -61,7 +60,7 @@ void ScreenTetris::MenuScreen(RenderWindow & window)
 		{
 			if (Number == 1)
 			{
-				exit = game(window);
+				exit = GameScreen(window);
 				if (exit == 0) { window.close(); }
 				if (exit == 1) { MenuScreen(window); }
 			}
@@ -88,11 +87,11 @@ bool ScreenTetris::RestartScreen(RenderWindow & window)
 	int Number = 0;
 
 	Texture t_again_btn, t_exit_btn;
-	t_again_btn.loadFromFile("IMAGE/again.png");
-	t_exit_btn.loadFromFile("IMAGE/exit.png");
+	t_again_btn.loadFromFile(againButtonAddress);
+	t_exit_btn.loadFromFile(exitButtonAddress);
 
 	Texture backgroundTexture;
-	backgroundTexture.loadFromFile("IMAGE/background1.png");
+	backgroundTexture.loadFromFile(menuBackgroundAddress);
 
 	Sprite again_btn(t_again_btn);
 	Sprite exit_btn(t_exit_btn);
@@ -103,7 +102,7 @@ bool ScreenTetris::RestartScreen(RenderWindow & window)
 	background.setPosition(0, 0);
 
 	Font font;
-	font.loadFromFile("IMAGE/04B_03__.ttf");
+	font.loadFromFile(fontAddress);
 
 	Text text_name("", font, 90);
 	text_name.setStyle(sf::Text::Bold);
@@ -151,7 +150,7 @@ bool ScreenTetris::RestartScreen(RenderWindow & window)
 		window.draw(text_best);
 
 		text_best.setPosition(390, 100);
-		text_best.setString(Convert(LoadBestScore("SAVE/score.txt")));
+		text_best.setString(Convert(LoadBestScore(saveScoreAddress)));
 		window.draw(text_best);
 
 		window.draw(text_name);
@@ -167,11 +166,11 @@ void ScreenTetris::AboutScreen(RenderWindow & window, int about)
 	int Number = 0;
 
 	Texture t_exit_btn;
-	t_exit_btn.loadFromFile("IMAGE/exit.png");
+	t_exit_btn.loadFromFile(exitButtonAddress);
 
 	Texture backgroundTexture, sfmlTexture;
-	backgroundTexture.loadFromFile("IMAGE/background1.png");
-	sfmlTexture.loadFromFile("IMAGE/sfml.png");
+	backgroundTexture.loadFromFile(menuBackgroundAddress);
+	sfmlTexture.loadFromFile(sfmlIconAddress);
 
 	Sprite exit_btn(t_exit_btn);
 	Sprite background(backgroundTexture);
@@ -182,7 +181,7 @@ void ScreenTetris::AboutScreen(RenderWindow & window, int about)
 	sfmlLogo.setPosition(450, 430);
 
 	Font font;
-	font.loadFromFile("IMAGE/04B_03__.ttf");
+	font.loadFromFile(fontAddress);
 
 	Text text_name("", font, 60);
 	text_name.setStyle(sf::Text::Bold);

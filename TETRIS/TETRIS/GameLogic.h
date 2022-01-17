@@ -2,5 +2,8 @@
 #include "ScreenTetris.h";
 #include "Utils.h"
 
+// Функция для проверки: приземлилась фигура или нет
 bool check();
-bool game(RenderWindow & window);
+
+// Функция для отрисовки игрового процесса + основная логика движения фигур по плоскости.
+bool GameScreen(RenderWindow & window);
