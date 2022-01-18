@@ -8,13 +8,16 @@ VISUAL STUDIO 2015 v14.025420.1
 using namespace sf;
 using namespace std;
 
+char *iconAddress = "Resources/image/icon.png";
+char *musicAddress = "Resources/sound/deep_sound.ogg";
+
 int main(void)
 {
 	Image icon;
-	if (!icon.loadFromFile("IMAGE/icon1.png")) return EXIT_FAILURE;
+	if (!icon.loadFromFile(iconAddress)) return EXIT_FAILURE;
 
 	Music music;
-	if (!music.openFromFile("IMAGE/Deep_Horrors.ogg")) return EXIT_FAILURE;
+	if (!music.openFromFile(musicAddress)) return EXIT_FAILURE;
 	music.setVolume(30);
 	music.play();
 
@@ -24,14 +27,10 @@ int main(void)
 	window.setFramerateLimit(30);
 
 	ScreenTetris ScreenTetris;
+	Event event;
 
 	while (window.isOpen())
 	{
-		Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == Event::Closed) window.close();
-		}
 		ScreenTetris.MenuScreen(window);
 	}
 

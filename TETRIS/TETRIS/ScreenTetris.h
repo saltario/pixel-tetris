@@ -24,5 +24,5 @@ public:
 
 	void MenuScreen(RenderWindow & window);
 	bool RestartScreen(RenderWindow & window);
-	void AboutScreen(RenderWindow & window, int about);
+	void AboutScreen(RenderWindow & window);
 };

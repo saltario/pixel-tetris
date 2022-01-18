@@ -2,9 +2,19 @@
 
 void ScreenTetris::MenuScreen(RenderWindow & window)
 {
-	bool exit;
-	int about = 1;
-	bool isButton = 1;
+	/*
+	Переменная isScreen фиксит мгновенный переход по экранам.
+	Пример, при переходе на экран рестарта, сразу открывается главное меню, лишь на мгновенье показав экран рестарта.
+	Данная переменная добавляет дополнительную оболочку для цикла эвентов.
+	Баг старый, из-за чего возникает и как исправить правильно, не понятно.
+	*/
+	bool isScreen = 1;
+	/*
+	Принимает значение с экрана рестарта:
+	 - рестарт (true)
+	 - выход из игры (false)
+	*/
+	bool gameResult;
 	int Number = 0;
 
 	Texture t_start_btn, t_exit_btn, t_about_btn;
@@ -33,57 +43,68 @@ void ScreenTetris::MenuScreen(RenderWindow & window)
 	text_name.setPosition(0, -40);
 	text_name.setString("TETRIS");
 
+	Event event;
 
-	while (isButton)
+	while (isScreen)
 	{
-		sleep(milliseconds(100));
-		Event event;
 		while (window.pollEvent(event))
 		{
 			if (event.type == Event::Closed)
-				window.close();
-		}
-
-		start_btn.setColor(Color::Cyan);
-		exit_btn.setColor(Color::Cyan);
-		about_btn.setColor(Color::Cyan);
-
-		Number = 0;
-
-		window.clear(Color::Black);
-
-		if (IntRect(190, 160, 110, 40).contains(Mouse::getPosition(window))) { start_btn.setColor(Color::Blue);    Number = 1; }
-		if (IntRect(190, 220, 110, 40).contains(Mouse::getPosition(window))) { exit_btn.setColor(Color::Blue);     Number = 2; }
-		if (IntRect(190, 280, 110, 40).contains(Mouse::getPosition(window))) { about_btn.setColor(Color::Blue);    Number = 3; }
-
-		if (Mouse::isButtonPressed(Mouse::Left))
-		{
-			if (Number == 1)
 			{
-				exit = GameScreen(window);
-				if (exit == 0) { window.close(); }
-				if (exit == 1) { MenuScreen(window); }
+				isScreen = 0;
+				window.close();
+				break;
 			}
-			if (Number == 2) { window.close(); }
-			if (Number == 3) { AboutScreen(window, about); }
+
+			start_btn.setColor(Color::Cyan);
+			exit_btn.setColor(Color::Cyan);
+			about_btn.setColor(Color::Cyan);
+
+			Number = 0;
+
+			window.clear(Color::Black);
+
+			if (IntRect(190, 160, 110, 40).contains(Mouse::getPosition(window))) { start_btn.setColor(Color::Blue);    Number = 1; }
+			if (IntRect(190, 220, 110, 40).contains(Mouse::getPosition(window))) { exit_btn.setColor(Color::Blue);     Number = 2; }
+			if (IntRect(190, 280, 110, 40).contains(Mouse::getPosition(window))) { about_btn.setColor(Color::Blue);    Number = 3; }
+
+			if (Mouse::isButtonPressed(Mouse::Left))
+			{
+				if (Number == 1)
+				{
+					gameResult = GameScreen(window);
+					if (gameResult == false) { window.close(); isScreen = 0; }
+					if (gameResult == true) { MenuScreen(window); isScreen = 0; }
+				}
+				if (Number == 2) { window.close(); isScreen = 0; }
+				if (Number == 3) { AboutScreen(window); isScreen = 0;}
+			}
+
+			// отрисовка
+			window.draw(background);
+
+			window.draw(text_name);
+			window.draw(text_name);
+
+			window.draw(start_btn);
+			window.draw(exit_btn);
+			window.draw(about_btn);
+
+			window.display();
 		}
-		//DRAW
-		window.draw(background);
-
-		window.draw(text_name);
-		window.draw(text_name);
-
-		window.draw(start_btn);
-		window.draw(exit_btn);
-		window.draw(about_btn);
-
-		window.display();
 	}
 }
 
+
 bool ScreenTetris::RestartScreen(RenderWindow & window)
 {
-	bool isButton = 1;
+	/*
+	Переменная isScreen фиксит мгновенный переход по экранам. 
+	Пример, при переходе на экран рестарта, сразу открывается главное меню, лишь на мгновенье показав экран рестарта.
+	Данная переменная добавляет дополнительную оболочку для цикла эвентов. 
+	Баг старый, из-за чего возникает и как исправить правильно, не понятно.
+	*/
+	bool isScreen = 1;
 	int Number = 0;
 
 	Texture t_again_btn, t_exit_btn;
@@ -112,57 +133,67 @@ bool ScreenTetris::RestartScreen(RenderWindow & window)
 	Text text_best("", font, 50);
 	text_best.setStyle(sf::Text::Bold);
 
-	while (isButton)
+	Event event;
+
+	while (isScreen)
 	{
-		Event event;
 		while (window.pollEvent(event))
 		{
 			if (event.type == Event::Closed)
+			{
+				isScreen = 0;
 				window.close();
+				break;
+			}
+
+			again_btn.setColor(Color::Cyan);
+			exit_btn.setColor(Color::Cyan);
+
+			Number = 0;
+
+			window.clear(Color::Black);
+
+			if (IntRect(190, 270, 110, 40).contains(Mouse::getPosition(window))) { again_btn.setColor(Color::Blue);    Number = 1; }
+			if (IntRect(190, 320, 110, 40).contains(Mouse::getPosition(window))) { exit_btn.setColor(Color::Blue);     Number = 2; }
+
+			if (Mouse::isButtonPressed(Mouse::Left))
+			{
+				if (Number == 1) { return 1; }
+
+				if (Number == 2) { window.close(); }
+			}
+
+			// отрисовка
+			window.draw(background);
+
+			window.draw(again_btn);
+			window.draw(exit_btn);
+			window.draw(text_name);
+
+			text_best.setPosition(75, 100);
+			text_best.setString("YOUR SCORE: ");
+			window.draw(text_best);
+
+			text_best.setPosition(390, 100);
+			text_best.setString(Convert(LoadBestScore(saveScoreAddress)));
+			window.draw(text_best);
+
+			window.draw(text_name);
+
+			window.display();		
 		}
-
-		again_btn.setColor(Color::Cyan);
-		exit_btn.setColor(Color::Cyan);
-
-		Number = 0;
-
-		window.clear(Color::Black);
-
-		if (IntRect(190, 270, 110, 40).contains(Mouse::getPosition(window))) { again_btn.setColor(Color::Blue);    Number = 1; }
-		if (IntRect(190, 320, 110, 40).contains(Mouse::getPosition(window))) { exit_btn.setColor(Color::Blue);     Number = 2; }
-
-		if (Mouse::isButtonPressed(Mouse::Left))
-		{
-			if (Number == 1) { return 1; }
-
-			if (Number == 2) { window.close(); }
-		}
-		//DRAW
-
-		window.draw(background);
-
-		window.draw(again_btn);
-		window.draw(exit_btn);
-		window.draw(text_name);
-
-		text_best.setPosition(75, 100);
-		text_best.setString("YOUR SCORE: ");
-		window.draw(text_best);
-
-		text_best.setPosition(390, 100);
-		text_best.setString(Convert(LoadBestScore(saveScoreAddress)));
-		window.draw(text_best);
-
-		window.draw(text_name);
-
-		window.display();
 	}
 }
 
-void ScreenTetris::AboutScreen(RenderWindow & window, int about)
+void ScreenTetris::AboutScreen(RenderWindow & window)
 {
-	int exit = about;
-	bool isButton = 1;
+	/*
+	Переменная isScreen фиксит мгновенный переход по экранам.
+	Пример, при переходе на экран рестарта, сразу открывается главное меню, лишь на мгновенье показав экран рестарта.
+	Данная переменная добавляет дополнительную оболочку для цикла эвентов.
+	Баг старый, из-за чего возникает и как исправить правильно, не понятно.
+	*/
+	bool isScreen = 1;
 	int Number = 0;
 
 	Texture t_exit_btn;
@@ -198,43 +229,47 @@ void ScreenTetris::AboutScreen(RenderWindow & window, int about)
 	text_coder.setPosition(115, 130);
 	text_coder.setString("ANARANT: PROGRAMMER");
 
+	Event event;
 
-	while (isButton)
+	while (isScreen)
 	{
-		Event event;
 		while (window.pollEvent(event))
 		{
 			if (event.type == Event::Closed)
-				window.close();
-		}
-
-		exit_btn.setColor(Color::Cyan);
-
-		Number = 0;
-
-		window.clear(Color::Black);
-
-		if (IntRect(190, 300, 110, 40).contains(Mouse::getPosition(window))) { exit_btn.setColor(Color::Blue);     Number = 1; }
-
-		if (Mouse::isButtonPressed(Mouse::Left))
-		{
-			if (Number == 1)
 			{
-
-				MenuScreen(window);
+				isScreen = 0;
+				window.close();
+				break;
 			}
 
+			exit_btn.setColor(Color::Cyan);
+
+			Number = 0;
+
+			window.clear(Color::Black);
+
+			if (IntRect(190, 300, 110, 40).contains(Mouse::getPosition(window))) { exit_btn.setColor(Color::Blue);     Number = 1; }
+
+			if (Mouse::isButtonPressed(Mouse::Left))
+			{
+				if (Number == 1)
+				{
+					MenuScreen(window);
+					isScreen = 0;
+				}
+			}
+
+			// отрисовка
+			window.draw(background);
+			window.draw(sfmlLogo);
+
+			window.draw(text_name);
+			window.draw(text_andre);
+			window.draw(text_coder);
+
+			window.draw(exit_btn);
+
+			window.display();
 		}
-		//DRAW
-		window.draw(background);
-		window.draw(sfmlLogo);
-
-		window.draw(text_name);
-		window.draw(text_andre);
-		window.draw(text_coder);
-
-		window.draw(exit_btn);
-
-		window.display();
 	}
 }
