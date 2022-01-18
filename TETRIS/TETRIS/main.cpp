@@ -21,7 +21,7 @@ int main(void)
 	music.setVolume(30);
 	music.play();
 
-	RenderWindow window(VideoMode(500, 480), "Tetris v1.9 Beta", Style::Close);
+	RenderWindow window(VideoMode(500, 480), "Tetris Beta", Style::Close);
 	window.setIcon(48, 48, icon.getPixelsPtr());
 	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(30);
