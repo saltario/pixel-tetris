@@ -81,91 +81,151 @@ bool GameScreen(RenderWindow & window)
 	backgroundTexture.loadFromFile(gameBackgroundAddress);
 	Sprite background(backgroundTexture);
 
-	srand(time(0));
-
-	int dx = 0;
-	bool rotate = 0;
-	bool w = 1;
-	bool active = 1;
-	int colorNum = 1;
-	float timer = 0;
-	float delay = 0.3;
+	// общее
 	Clock clock;
-	float time;
+	Event event;
+	bool isScreen = true;
 
-	while (w == 1)
+	srand(time(0));
+	float time;
+	float timer = 0;
+
+	int tetrisColor = 1 + rand() % 7;
+	int tetrisRandom = rand() % 7;
+
+	int verticalN;
+	int horizontalM;
+
+	int verticalCount;
+	int horizontalCount;
+
+	// движение
+	int dx = 0;
+	float delay = 0.3;
+
+	// вращение
+	Point centerOfRotation;
+	int rotationX;
+	int rotationY;
+	bool isRotate = false;
+
+	while (isScreen)
 	{
 		time = clock.getElapsedTime().asSeconds();
 		clock.restart();
 		timer += time;
-
-		Event e;
-		while (window.pollEvent(e))
+		
+		while (window.pollEvent(event))
 		{
-			if (e.type == Event::Closed)
+			if (event.type == Event::Closed)
+			{
+				isScreen = 0;
 				window.close();
+				break;
+			}
 
-			if (e.type == Event::KeyPressed)
-				if (e.key.code == Keyboard::Up) rotate = true;
-				else if (e.key.code == Keyboard::Left) dx = -1;
-				else if (e.key.code == Keyboard::Right) dx = 1;
+			if (event.type == Event::KeyPressed)
+			{
+				// для эвента происъодит обработка однократного нажатия, что позволяет корректно обработать одно нажатие
+				// иначе происходит плавное смещение на несколько позиций что актуально только при движении вниз
+				if (event.key.code == Keyboard::Up) isRotate = true;
+				if (event.key.code == Keyboard::Left) dx = -1;
+				if (event.key.code == Keyboard::Right) dx = 1;
+			}	
 		}
+
+		// обработка длительного нажатия, задерживаем "вниз" и фигура летит вниз плавно и быстро
 		if (Keyboard::isKeyPressed(Keyboard::Down)) delay = 0.05;
 
-		// движение
-		for (int i = 0; i < 4; i++) { b[i] = a[i]; a[i].x += dx; }
-		if (!check()) for (int i = 0; i < 4; i++) a[i] = b[i];
-
-		// вращение
-		if (rotate)
-		{
-			Point p = a[1]; // центр вращения
-			for (int i = 0; i < 4; i++)
-			{
-				int x = a[i].y - p.y;
-				int y = a[i].x - p.x;
-				a[i].x = p.x - x;
-				a[i].y = p.y + y;
-			}
-			if (!check()) for (int i = 0; i < 4; i++) a[i] = b[i];
+		// движение по горизонтали
+		for (int i = 0; i < 4; i++) 
+		{ 
+			b[i] = a[i]; 
+			a[i].x += dx; 
 		}
 
-		// тики
-		if (timer > delay)
+		if (!check()) 
 		{
-			for (int i = 0; i < 4; i++) { b[i] = a[i]; a[i].y += 1; }
-			if (check() == 0)
+			for (int i = 0; i < 4; i++)
 			{
-				// приземлилась
-				for (int i = 0; i < 4; i++) field[b[i].y][b[i].x] = colorNum;
-				colorNum = 1 + rand() % 7;
-				int n = rand() % 7;
+				a[i] = b[i];
+			}
+		}
+
+		// вращение
+		if (isRotate)
+		{
+			centerOfRotation = a[1];
+
+			for (int i = 0; i < 4; i++)
+			{
+				rotationX = a[i].y - centerOfRotation.y;
+				rotationY = a[i].x - centerOfRotation.x;
+				a[i].x = centerOfRotation.x - rotationX;
+				a[i].y = centerOfRotation.y + rotationY;
+			}
+
+			if (!check())
+			{
 				for (int i = 0; i < 4; i++)
 				{
-					a[i].x = figures[n][i] % 2;
-					a[i].y = figures[n][i] / 2;
+					a[i] = b[i];
 				}
 			}
-			if (check() == 1)
+		}
+
+		// движение по времени
+		if (timer > delay)
+		{
+			// движение по вертикали
+			for (int i = 0; i < 4; i++) 
 			{
-				//едет вниз
+				b[i] = a[i];
+				a[i].y += 1; 
+			}
+
+			if (!check())
+			{
+				// приземлилась
+				for (int i = 0; i < 4; i++)
+				{
+					field[b[i].y][b[i].x] = tetrisColor;
+				}
+					
+				tetrisColor = 1 + rand() % 7;
+				tetrisRandom = rand() % 7;
+
+				for (int i = 0; i < 4; i++)
+				{
+					a[i].x = figures[tetrisRandom][i] % 2;
+					a[i].y = figures[tetrisRandom][i] / 2;
+				}
 			}
 			timer = 0;
 		}
 
 		// проверка горизонтальных линий
-		int k = M - 1;
-		int count = 0;
+		horizontalM = M - 1;
+		horizontalCount = 0;
+
 		for (int i = M - 1; i > 0; i--)
 		{
-			count = 0;
+			horizontalCount = 0;
 			for (int j = 0; j < N; j++)
 			{
-				if (field[i][j]) { count++; }
-				field[k][j] = field[i][j];
+				if (field[i][j]) 
+				{ 
+					horizontalCount++;
+				}
+				field[horizontalM][j] = field[i][j];
 			}
-			if (count < N) { k--; }
-			if (count == N)
+
+			if (horizontalCount < N)
+			{ 
+				horizontalM--; 
+			}
+
+			if (horizontalCount == N)
 			{
 				player.setPlayerScore(player.getPlayerScore() + 1);
 				text_score.setString(Convert(player.getPlayerScore()));
@@ -174,15 +234,17 @@ bool GameScreen(RenderWindow & window)
 		}
 		
 		// проверка вертикальных линий
-		int k1 = N - 1;
+		verticalN = N - 1;
+		verticalCount = 0;
+
 		for (int i = 0; i < M; i++)
 		{
-			int count1 = 0;
+			verticalCount = 0;
 			for (int j = N - 1; j > 0; j--)
 			{
 				if (field[1][j])
 				{
-					count1++;
+					verticalCount++;
 					for (int h = 0; h < M; h++)
 					{
 						for (int g = 0; g < N; g++)
@@ -190,13 +252,19 @@ bool GameScreen(RenderWindow & window)
 							field[h][g] = 0;
 						}
 					}
-					w = 0;
+					isScreen = 0;
 				}
 			}
-			if (count1 < N) { k1--; }
+			if (verticalCount < N) 
+			{ 
+				verticalN--; 
+			}
 		}
 
-		dx = 0; rotate = 0; delay = 0.3;
+		// обнуление
+		dx = 0; 
+		isRotate = 0; 
+		delay = 0.3;
 
 		// отрисовка
 		window.clear(Color::Black);
@@ -209,16 +277,16 @@ bool GameScreen(RenderWindow & window)
 				if (field[i][j] == 0) continue;
 				tiles.setTextureRect(IntRect(field[i][j] * 18, 0, 18, 18));
 				tiles.setPosition(j * 18, i * 18);
-				tiles.move(28, 31); // смещение
+				tiles.move(28, 31);
 				window.draw(tiles);
 			}
 		}
 
 		for (int i = 0; i < 4; i++)
 		{
-			tiles.setTextureRect(IntRect(colorNum * 18, 0, 18, 18));
+			tiles.setTextureRect(IntRect(tetrisColor * 18, 0, 18, 18));
 			tiles.setPosition(a[i].x * 18, a[i].y * 18);
-			tiles.move(28, 31); // смещение
+			tiles.move(28, 31);
 			window.draw(tiles);
 		}
 
@@ -240,22 +308,14 @@ bool GameScreen(RenderWindow & window)
 		text_best_score.setPosition(408, 70);
 		window.draw(text_best_score);
 
-		if (active)
-		{
-			text_score.setString(Convert(player.getPlayerScore()));
-			text_best_score.setString(Convert(LoadBestScore(saveScoreAddress)));
-			window.draw(text_score);
-			window.draw(text_best_score);
-			active = 0;
-		}
+		text_score.setString(Convert(player.getPlayerScore()));
+		text_best_score.setString(Convert(LoadBestScore(saveBestScoreAddress)));
+		window.draw(text_score);
+		window.draw(text_best_score);
 
 		window.display();
-
-		if (w == 0)
-		{
-			break;
-		}
 	}
+
 	if (player.getPlayerScore() >= LoadBestScore(saveBestScoreAddress))
 	{
 		player.setPlayerBestScore(player.getPlayerScore());
