@@ -31,6 +31,15 @@ int main(void)
 
 	while (window.isOpen())
 	{
+		while (window.pollEvent(event))
+		{
+			if (event.type == Event::Closed)
+			{
+				window.close();
+				break;
+			}
+		}
+
 		ScreenTetris.MenuScreen(window);
 	}
 
