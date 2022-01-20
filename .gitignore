@@ -28,6 +28,9 @@ db.lock
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
+# Folder with full resources
+TETRIS/SFML-2.5.1/examples/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
