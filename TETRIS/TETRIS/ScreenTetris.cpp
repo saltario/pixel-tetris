@@ -106,20 +106,25 @@ bool ScreenTetris::RestartScreen(RenderWindow & window)
 	*/
 	bool isScreen = 1;
 	int Number = 0;
+	int startPositionButtonX = 190;
+	int startPositionButtonY = 200;
 
-	Texture t_again_btn, t_exit_btn;
+	Texture t_again_btn, t_exit_btn, t_menu_btn;
 	t_again_btn.loadFromFile(againButtonAddress);
 	t_exit_btn.loadFromFile(exitButtonAddress);
+	t_menu_btn.loadFromFile(menuButtonAddress);
 
 	Texture backgroundTexture;
 	backgroundTexture.loadFromFile(menuBackgroundAddress);
 
 	Sprite again_btn(t_again_btn);
 	Sprite exit_btn(t_exit_btn);
+	Sprite menu_btn(t_menu_btn);
 	Sprite background(backgroundTexture);
 
-	again_btn.setPosition(190, 270);
-	exit_btn.setPosition(190, 320);
+	again_btn.setPosition(startPositionButtonX, startPositionButtonY);
+	menu_btn.setPosition(startPositionButtonX, startPositionButtonY + 50);
+	exit_btn.setPosition(startPositionButtonX, startPositionButtonY + 100);
 	background.setPosition(0, 0);
 
 	Font font;
@@ -148,25 +153,28 @@ bool ScreenTetris::RestartScreen(RenderWindow & window)
 
 			again_btn.setColor(Color::Cyan);
 			exit_btn.setColor(Color::Cyan);
+			menu_btn.setColor(Color::Cyan);
 
 			Number = 0;
 
 			window.clear(Color::Black);
 
-			if (IntRect(190, 270, 110, 40).contains(Mouse::getPosition(window))) { again_btn.setColor(Color::Blue);    Number = 1; }
-			if (IntRect(190, 320, 110, 40).contains(Mouse::getPosition(window))) { exit_btn.setColor(Color::Blue);     Number = 2; }
+			if (IntRect(startPositionButtonX, startPositionButtonY, 110, 40).contains(Mouse::getPosition(window))) { again_btn.setColor(Color::Blue);    Number = 1; }
+			if (IntRect(startPositionButtonX, startPositionButtonY + 50, 110, 40).contains(Mouse::getPosition(window))) { menu_btn.setColor(Color::Blue);     Number = 2; }
+			if (IntRect(startPositionButtonX, startPositionButtonY + 100, 110, 40).contains(Mouse::getPosition(window))) { exit_btn.setColor(Color::Blue);     Number = 3; }
 
 			if (Mouse::isButtonPressed(Mouse::Left))
 			{
 				if (Number == 1) { return 1; }
-
-				if (Number == 2) { window.close(); }
+				if (Number == 2) { MenuScreen(window); isScreen = false; }
+				if (Number == 3) { window.close(); }
 			}
 
 			// отрисовка
 			window.draw(background);
 
 			window.draw(again_btn);
+			window.draw(menu_btn);
 			window.draw(exit_btn);
 			window.draw(text_name);
 
