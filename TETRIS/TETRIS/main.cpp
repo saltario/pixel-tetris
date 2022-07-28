@@ -38,7 +38,7 @@ int main(void)
 			if (event.type == Event::Closed)
 			{
 				window.close();
-				break;
+				//break;
 			}
 		}
 
